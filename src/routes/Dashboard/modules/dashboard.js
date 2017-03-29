@@ -4,7 +4,7 @@
 export const DASHBOARD_INCREMENT = 'DASHBOARD_INCREMENT'
 export const DASHBOARD_ADD_ITEM = 'DASHBOARD_ADD_ITEM'
 export const DASHBOARD_EDIT_ITEM = 'DASHBOARD_EDIT_ITEM'
-
+export const DASHBOARD_REORDER_ITEM = 'DASHBOARD_REORDER_ITEM'
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -25,6 +25,13 @@ export function dashboardEditItem (value) {
 export function dashboardVisitIncrement (value = 1) {
   return {
     type    : DASHBOARD_INCREMENT,
+    payload : value
+  }
+}
+
+export function dashboardReorderItems (value) {
+  return {
+    type    : DASHBOARD_REORDER_ITEM,
     payload : value
   }
 }
@@ -72,6 +79,21 @@ const ACTION_HANDLERS = {
     return {
       ...state,
       dashboardItems: immutableDashboardItems
+    }
+  },
+  [DASHBOARD_REORDER_ITEM]: (state, action) => {
+    const { end: nextPosIndex, start: currPosIndex } = action.payload
+    const element = state.dashboardItems[currPosIndex]
+    let dashboardItems = [
+      ...state.dashboardItems.slice(0, currPosIndex),
+      ...state.dashboardItems.slice(currPosIndex + 1)
+    ]
+
+    dashboardItems.splice(nextPosIndex, 0, element)
+
+    return {
+      ...state,
+      dashboardItems
     }
   }
 }

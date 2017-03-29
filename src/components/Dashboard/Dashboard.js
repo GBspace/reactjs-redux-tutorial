@@ -6,12 +6,33 @@ export class Dashboard extends React.Component {
   static propTypes = {
     dashboardItems   : React.PropTypes.array.isRequired,
     updateItem       : React.PropTypes.func.isRequired,
+    reorderItem       : React.PropTypes.func.isRequired,
     visitsCount      : React.PropTypes.number.isRequired
   }
 
   state = {
     inputValue: '',
+    draggedItemIndex: null,
     editedItemIndex: null
+  }
+
+  handleOnDragStart = ev => this.setState({ draggedItemIndex: ev.target.id })
+
+  handleOnDragOver = ev => {
+    ev.preventDefault()
+    ev.dataTransfer.dropEffect = 'move'  // See the section on the DataTransfer object.
+    // You can add here more logic if required
+  }
+
+  handleOnDrop = ev => {
+    const droppedItemId = ev.currentTarget.id
+    if (this.state.editedItemIndex === null) {
+      this.props.reorderItem({
+        start: this.state.draggedItemIndex,
+        end: droppedItemId
+      })
+    }
+    this.setState({ draggedItemIndex: null })
   }
 
   onChangeInput = ev => this.setState({ inputValue: ev.target.value })
@@ -59,6 +80,9 @@ export class Dashboard extends React.Component {
             type='submit' />
         </form>
         <ListJSX
+          onDragOver={this.handleOnDragOver}
+          onDragStart={this.handleOnDragStart}
+          onDrop={this.handleOnDrop}
           activeIndex={this.state.editedItemIndex}
           dashboardItems={dashboardItems}
           onClick={this.itemOnEdit} />
