@@ -25,13 +25,25 @@ export const actions = {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [DASHBOARD_INCREMENT]   : (state, action) => state + action.payload
+  [DASHBOARD_INCREMENT]   : (state, action) => ({
+    ...state,
+    visitsCount : state.visitsCount + action.payload
+  })
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = 0
+const initialState = {
+  visitsCount: 0,
+  dashboardItems: [
+    { label: 'Angular' },
+    { label: 'JQuery' },
+    { label: 'Polymer' },
+    { label: 'ReactJS' }
+  ]
+}
+
 export default function dashboardReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
