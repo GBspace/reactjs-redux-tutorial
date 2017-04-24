@@ -1,13 +1,14 @@
 import React from 'react'
 import './Dashboard.scss'
 import ListJSX from './ListJSX'
+import PropTypes from 'prop-types'
 
 export class Dashboard extends React.Component {
   static propTypes = {
-    dashboardItems   : React.PropTypes.array.isRequired,
-    updateItem       : React.PropTypes.func.isRequired,
-    reorderItem       : React.PropTypes.func.isRequired,
-    visitsCount      : React.PropTypes.number.isRequired
+    dashboardItems   : PropTypes.array.isRequired,
+    updateItem       : PropTypes.func.isRequired,
+    reorderItem      : PropTypes.func.isRequired,
+    visitsCount      : PropTypes.number.isRequired
   }
 
   state = {

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import Header from '../../components/Header'
 import './CoreLayout.scss'
 import '../../styles/core.scss'
@@ -21,7 +22,7 @@ export class CoreLayout extends Component {
   }
 
   static contextTypes = {
-    router: React.PropTypes.object
+    router: PropTypes.object
   }
 
   handleLogin = (loginObj) => {

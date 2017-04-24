@@ -2,6 +2,7 @@ import React from 'react'
 import { IndexLink, Link } from 'react-router'
 import './Header.scss'
 import LoginJSX from './LoginJSX'
+import PropTypes from 'prop-types'
 
 export const Header = ({ session, handleLogin }) => {
   let loginMessageJSX = (!session.isLoggedIn && session.loginToken === 'invalid')
@@ -29,8 +30,8 @@ export const Header = ({ session, handleLogin }) => {
 }
 
 Header.propTypes = {
-  session: React.PropTypes.object.isRequired,
-  handleLogin: React.PropTypes.func.isRequired
+  session: PropTypes.object.isRequired,
+  handleLogin: PropTypes.func.isRequired
 }
 
 export default Header
