@@ -2,6 +2,11 @@ import React, { PropTypes } from 'react'
 import Dashboard from 'components/Dashboard'
 
 class DashboardRoute extends React.Component {
+  
+  constructor (props) {
+      super(props)
+      this.props.fetchDashboardDataAsync()
+  }
 
   static propTypes = {
     dashboardVisitIncrement: PropTypes.func.isRequired,
@@ -35,9 +40,9 @@ class DashboardRoute extends React.Component {
   }
 
   render () {
-    if (!this.props.session.isLoggedIn) {
-      return <h4>Please login in order to access your dashboard</h4>
-    }
+    // if (!this.props.session.isLoggedIn) {
+    //   return <h4>Please login in order to access your dashboard</h4>
+    // }
     const { dashboard } = this.props
     return (
       <Dashboard
