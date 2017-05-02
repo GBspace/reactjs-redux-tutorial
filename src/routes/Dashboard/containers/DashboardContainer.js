@@ -3,7 +3,8 @@ import {
   dashboardAddItem,
   dashboardEditItem,
   dashboardVisitIncrement,
-  dashboardReorderItems
+  dashboardReorderItems,
+  fetchDashboardDataAsync
 } from '../modules/dashboard'
 
 /*  This is a container component. Notice it does not contain any JSX,
@@ -21,7 +22,8 @@ const mapDispatchToProps = {
   dashboardVisitIncrement : () => dashboardVisitIncrement(1),
   dashboardAddItem,
   dashboardEditItem,
-  dashboardReorderItems
+  dashboardReorderItems,
+  fetchDashboardDataAsync
 }
 
 const mapStateToProps = (state) => ({
@@ -30,14 +32,12 @@ const mapStateToProps = (state) => ({
 })
 
 /*  Note: mapStateToProps is where you should use `reselect` to create selectors, ie:
-
     import { createSelector } from 'reselect'
     const dashboard = (state) => state.dashboard
     const tripleCount = createSelector(dashboard, (count) => count * 3)
     const mapStateToProps = (state) => ({
       dashboard: tripleCount(state)
     })
-
     Selectors can compute derived data, allowing Redux to store the minimal possible state.
     Selectors are efficient. A selector is not recomputed unless one of its arguments change.
     Selectors are composable. They can be used as input to other selectors.
