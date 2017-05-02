@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 import './Dashboard.scss'
 
 const ListJSX = ({ dashboardItems, onClick, activeIndex, onDragOver, onDragStart, onDrop }) => {
