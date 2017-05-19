@@ -53,8 +53,35 @@ export function dashboardReorderItems (value) {
 
 export const fetchDashboardDataAsync = () => {
   return async (dispatch, getState) => {
-    const query = gql`query GetAllDashboardItems {
+    // below we are mocking the list name, but in future
+    // when we will have more than just a one list
+    // then that name below "dashboardMainListOrder"
+    // will be dynamic one
+
+    const dashboardListOrderName = 'dashboardMainListOrder'
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #1 - (fetch the items order) and
+    // ************* STEP #2 - (fetch the items details)
+    // *************
+
+    // this query, is asking for the Order and items details
+    const query = gql`query GetAllDashboardItemListOrders {
        viewer {
+         allDashboardItemListOrders ( where: {
+           orderListName: {
+             eq: "${dashboardListOrderName}"
+           }
+         }) {
+           edges {
+             node {
+               id
+               orderListIdsArray
+               orderListName
+             }
+           }
+         }
          allDashboardItems  {
            edges {
              node {
@@ -69,19 +96,37 @@ export const fetchDashboardDataAsync = () => {
     const dashboardItemsArray = await client
       .query({ query })
       .then(results => {
-        const {
-          data: {
-            viewer: {
-              allDashboardItems: { edges }
-            }
-          }
-        } = results
+        const { allDashboardItems, allDashboardItemListOrders } = results.data.viewer
 
-        const resArray = edges.map(item => {
+        // check availablity orders in the response
+        if (!(
+          allDashboardItemListOrders &&
+          allDashboardItemListOrders.edges &&
+          allDashboardItemListOrders.edges.length
+        )) {
+          // thow error, which will catched by error handler below
+          throw new Error(`Step 1 & 2. allDashboardItemListOrders collection
+wasn't filled. See video how to fill collection`)
+        }
+
+        const { orderListIdsArray } = allDashboardItemListOrders.edges[0].node
+
+        // Prepare convenient format for dashboardItems
+        let dashboardItemsJson = {}
+        allDashboardItems.edges.map((item, i) => {
+          dashboardItemsJson[item.node.id] = item.node
           return item.node
         })
 
-        return resArray
+        // *****************************************************************
+        // *************
+        // ************* STEP #3 - (mix the order with the items details)
+        // *************
+        const dashboardItemsArrayOrdered = orderListIdsArray.map((listItemID) => {
+          return dashboardItemsJson[listItemID]
+        })
+
+        return dashboardItemsArrayOrdered
       }).catch(errorReason => {
         // Here you handle any errors.
         // You can dispatch some
@@ -93,6 +138,10 @@ export const fetchDashboardDataAsync = () => {
         return [] // anyway return empty an array for correctly working fetchDashboardDataSuccess action
       })
 
+    // *****************************************************************
+    // *************
+    // ************* STEP #4 - (dispatch the dashboardItemsArray)
+    // *************
     dispatch(fetchDashboardDataSuccess(dashboardItemsArray))
   }
 }
