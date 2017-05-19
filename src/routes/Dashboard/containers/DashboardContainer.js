@@ -3,7 +3,8 @@ import {
   dashboardAddItem,
   dashboardEditItem,
   dashboardVisitIncrement,
-  dashboardReorderItems
+  dashboardReorderItems,
+  fetchDashboardDataAsync
 } from '../modules/dashboard'
 
 /*  This is a container component. Notice it does not contain any JSX,
@@ -21,7 +22,8 @@ const mapDispatchToProps = {
   dashboardVisitIncrement : () => dashboardVisitIncrement(1),
   dashboardAddItem,
   dashboardEditItem,
-  dashboardReorderItems
+  dashboardReorderItems,
+  fetchDashboardDataAsync
 }
 
 const mapStateToProps = (state) => ({

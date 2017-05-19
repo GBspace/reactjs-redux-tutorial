@@ -1,4 +1,5 @@
-import { client } from 'utils/apolloConfig'
+import client from 'utils/apolloConfig'
+import gql from 'graphql-tag'
 
 // ------------------------------------
 // Constants
@@ -7,6 +8,7 @@ export const DASHBOARD_INCREMENT = 'DASHBOARD_INCREMENT'
 export const DASHBOARD_ADD_ITEM = 'DASHBOARD_ADD_ITEM'
 export const DASHBOARD_EDIT_ITEM = 'DASHBOARD_EDIT_ITEM'
 export const DASHBOARD_REORDER_ITEM = 'DASHBOARD_REORDER_ITEM'
+export const FETCH_DASHBOARD_DATA_SUCCESS = 'FETCH_DASHBOARD_DATA_SUCCESS'
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -14,6 +16,13 @@ export function dashboardAddItem (value) {
   return {
     type    : DASHBOARD_ADD_ITEM,
     payload : value
+  }
+}
+
+export function fetchDashboardDataSuccess (value) {
+  return {
+    type: FETCH_DASHBOARD_DATA_SUCCESS,
+    payload: value
   }
 }
 
@@ -42,6 +51,52 @@ export function dashboardReorderItems (value) {
     returns a function for lazy evaluation. It is incredibly useful for
     creating async actions, especially when combined with redux-thunk! */
 
+export const fetchDashboardDataAsync = () => {
+  return async (dispatch, getState) => {
+    const query = gql`query GetAllDashboardItems {
+       viewer {
+         allDashboardItems  {
+           edges {
+             node {
+               id
+               label
+             }
+           }
+         }
+       }
+     }`
+
+    const dashboardItemsArray = await client
+      .query({ query })
+      .then(results => {
+        const {
+          data: {
+            viewer: {
+              allDashboardItems: { edges }
+            }
+          }
+        } = results
+
+        const resArray = edges.map(item => {
+          return item.node
+        })
+
+        return resArray
+      }).catch(errorReason => {
+        // Here you handle any errors.
+        // You can dispatch some
+        // custom error actions like:
+        // dispatch(yourCustomErrorAction(errorReason))
+
+        alert('Apollo client error. See console')
+        console.error('apollo client error:', errorReason.message)
+        return [] // anyway return empty an array for correctly working fetchDashboardDataSuccess action
+      })
+
+    dispatch(fetchDashboardDataSuccess(dashboardItemsArray))
+  }
+}
+
 export const actions = {
   dashboardVisitIncrement
 }
@@ -50,6 +105,13 @@ export const actions = {
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
+  [FETCH_DASHBOARD_DATA_SUCCESS]: (state, action) => {
+    console.info('FETCH_DASHBOARD_DATA_SUCCESS action.payload', action.payload)
+    return {
+      ...state,
+      dashboardItems: action.payload
+    }
+  },
   [DASHBOARD_INCREMENT]   : (state, action) => ({
     ...state,
     visitsCount : state.visitsCount + action.payload
@@ -104,12 +166,9 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  dashboardHasFetchedData: false,
   visitsCount: 0,
   dashboardItems: [
-    { label: 'Angular' },
-    { label: 'JQuery' },
-    { label: 'Polymer' },
-    { label: 'ReactJS' }
   ]
 }
 

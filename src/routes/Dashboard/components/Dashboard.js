@@ -10,7 +10,14 @@ class DashboardRoute extends React.Component {
     dashboardEditItem: PropTypes.func.isRequired,
     dashboardReorderItems: PropTypes.func.isRequired,
     dashboard: PropTypes.object.isRequired,
-    session: PropTypes.object.isRequired
+    fetchDashboardDataAsync: PropTypes.func.isRequired
+    // will comment session object while we don't use it
+    // session: PropTypes.object.isRequired
+  }
+
+  constructor (props) {
+    super(props)
+    this.props.fetchDashboardDataAsync()
   }
 
   componentDidMount () {
@@ -36,9 +43,9 @@ class DashboardRoute extends React.Component {
   }
 
   render () {
-    if (!this.props.session.isLoggedIn) {
-      return <h4>Please login in order to access your dashboard</h4>
-    }
+    // if (!this.props.session.isLoggedIn) {
+      // return <h4>Please login in order to access your dashboard</h4>
+    // }
     const { dashboard } = this.props
     return (
       <Dashboard
