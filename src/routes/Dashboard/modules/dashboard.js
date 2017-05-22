@@ -109,7 +109,10 @@ export const fetchDashboardDataAsync = () => {
 wasn't filled. See video how to fill collection`)
         }
 
-        const { orderListIdsArray } = allDashboardItemListOrders.edges[0].node
+        const {
+          id : currentListId,
+          orderListIdsArray
+        } = allDashboardItemListOrders.edges[0].node
 
         // Prepare convenient format for dashboardItems
         let dashboardItemsJson = {}
@@ -126,7 +129,7 @@ wasn't filled. See video how to fill collection`)
           return dashboardItemsJson[listItemID]
         })
 
-        return dashboardItemsArrayOrdered
+        return { dashboardItemsArrayOrdered, currentListId }
       }).catch(errorReason => {
         // Here you handle any errors.
         // You can dispatch some
@@ -135,7 +138,10 @@ wasn't filled. See video how to fill collection`)
 
         alert('Apollo client error. See console')
         console.error('apollo client error:', errorReason.message)
-        return [] // anyway return empty an array for correctly working fetchDashboardDataSuccess action
+        return {
+          dashboardItemsArrayOrdered: [],
+          currentListId: null
+        } // anyway return empty an array for correctly working fetchDashboardDataSuccess action
       })
 
     // *****************************************************************
@@ -156,9 +162,11 @@ export const actions = {
 const ACTION_HANDLERS = {
   [FETCH_DASHBOARD_DATA_SUCCESS]: (state, action) => {
     console.info('FETCH_DASHBOARD_DATA_SUCCESS action.payload', action.payload)
+    const { dashboardItemsArrayOrdered, currentListId } = action.payload
     return {
       ...state,
-      dashboardItems: action.payload
+      dashboardItems: dashboardItemsArrayOrdered,
+      currentListId
     }
   },
   [DASHBOARD_INCREMENT]   : (state, action) => ({
@@ -215,6 +223,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = {
+  currentListId: null,
   dashboardHasFetchedData: false,
   visitsCount: 0,
   dashboardItems: [
