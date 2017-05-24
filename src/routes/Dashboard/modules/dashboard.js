@@ -152,6 +152,110 @@ wasn't filled. See video how to fill collection`)
   }
 }
 
+export const dashboardAddItemAsync = ({ label }) => {
+  return async (dispatch, getState) => {
+    // const { newDashboardItemValue, dashboardState } = newDashboardItemObject
+    const { currentListId, dashboardItems } = getState().dashboard
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #1 - (preparation of the mutation query)
+    // *************
+    const mutationInsert = gql`mutation CreateNested($data: CreateDashboardItemInput!) {
+      createDashboardItem(input: $data) {
+        changedDashboardItem {
+          id
+          label
+        }
+      }
+    }`
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #2. - preparation of the variables that we need to insert
+    // *************
+    const variablesInsert = {
+      data: {
+        label
+      }
+    }
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #3. - making the mutations and retrieving the newDashboardItemID
+    // *************
+
+    try {
+      const newDashboardItem = await client
+        .mutate({ mutation: mutationInsert, variables: variablesInsert })
+        .then((results) => results.data.createDashboardItem.changedDashboardItem)
+
+      // *****************************************************************
+      // *************
+      // ************* STEP #4. - OK, we've got the ID. Let's update the list
+      // *************
+      console.info('here is the ID: ', newDashboardItem.id)
+
+      // *****************************************************************
+      // *************
+      // ************* STEP #5. - preparation of the mutation query
+      // *************
+      const mutationListUpdate = gql`mutation UpdateDashboardItemListOrder($data: UpdateDashboardItemListOrderInput!) {
+        updateDashboardItemListOrder(input: $data) {
+          changedDashboardItemListOrder {
+            id
+            orderListIdsArray
+          }
+        }
+      }`
+
+      // the currentListArray holds an array of IDs, which we will update later
+      // via the GraphQL query (see step 6, below)
+      const currentListArray = dashboardItems.map((dashboardItem) => dashboardItem.id)
+
+      // *****************************************************************
+      // *************
+      // ************* STEP #6. - preparation of the variables that we need to have in order to update
+      // *************
+      const variablesListUpdate = {
+        data: {
+          // this ID, is the ID of the list which we want to update
+          id: currentListId,
+          // here is going a current list with all IDS (including the new one)
+          // we are using the ES6's "..."  spread operator
+          orderListIdsArray: [...currentListArray, newDashboardItem.id]
+        }
+      }
+
+      // *****************************************************************
+      // *************
+      // ************* STEP #7. - doing the async backend call with all details
+      // ************* (GraphQL query doing the heavy lifting now)
+      // *************
+      await client
+        .mutate({ mutation: mutationListUpdate, variables: variablesListUpdate })
+        // .then((results) => {
+          // const newObjectId = results.data.createDashboardItemListOrder.changedDashboardItemListOrder.id
+          // return newObjectId
+        // })
+
+      // *****************************************************************
+      // *************
+      // ************* STEP #8. - we have updated the list, let's dispatch the new value and ID
+      // *************
+      dispatch(dashboardAddItem(newDashboardItem))
+    } catch (errorReason) {
+      // Here you handle any errors.
+      // You can dispatch some
+      // custom error actions like:
+      // dispatch(yourCustomErrorAction(errorReason))
+
+      alert('Apollo client add handler error. See console')
+      console.error('apollo client add handler error:', errorReason.message)
+    }
+  }
+}
+
 export const actions = {
   dashboardVisitIncrement
 }
@@ -174,10 +278,10 @@ const ACTION_HANDLERS = {
     visitsCount : state.visitsCount + action.payload
   }),
   [DASHBOARD_ADD_ITEM]: (state, action) => {
-    const mockedId = Math.floor(Date.now() / 1000)
+    // const mockedId = Math.floor(Date.now() / 1000)
     const newItem = {
       label: action.payload.label,
-      id: mockedId
+      id: action.payload.id
     }
 
     return {

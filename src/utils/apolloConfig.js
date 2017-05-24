@@ -1,7 +1,7 @@
 import ApolloClient, { createNetworkInterface } from 'apollo-client'
 
 const config = {
-  scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/reactjs-co'
+  scapholdUrl: 'https://us-west-2.api.scaphold.io/graphql/t-reactjs-co2'
 }
 
 const opts = { uri: config.scapholdUrl }
