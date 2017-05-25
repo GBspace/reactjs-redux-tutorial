@@ -6,7 +6,7 @@ class DashboardRoute extends React.Component {
 
   static propTypes = {
     dashboardVisitIncrement: PropTypes.func.isRequired,
-    dashboardAddItem: PropTypes.func.isRequired,
+    dashboardAddItemAsync: PropTypes.func.isRequired,
     dashboardEditItem: PropTypes.func.isRequired,
     dashboardReorderItems: PropTypes.func.isRequired,
     dashboard: PropTypes.object.isRequired,
@@ -26,7 +26,7 @@ class DashboardRoute extends React.Component {
 
   updateItem = ({ editItemIndex, label }) => (
     editItemIndex === null
-    ? this.props.dashboardAddItem({ label })
+    ? this.props.dashboardAddItemAsync({ label })
     : this.props.dashboardEditItem({ editItemIndex, label })
   )
 
