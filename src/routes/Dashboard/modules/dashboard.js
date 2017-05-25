@@ -330,6 +330,58 @@ export const dashboardReorderItemsAsync = (reorderValues) => {
   }
 }
 
+export const dashboardEditItemAsync = ({ editItemIndex, label }) => {
+  return async (dispatch, getState) => {
+    const { dashboardItems } = getState().dashboard
+    const currentItemInEditId = dashboardItems[editItemIndex].id
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #1. - preparation of the mutation query
+    // *************
+    const mutationDashboardItemUpdate = gql`mutation UpdateDashboardItem($data: UpdateDashboardItemInput!) {
+      updateDashboardItem(input: $data) {
+        changedDashboardItem {
+          id
+          label
+        }
+      }
+    }`
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #2. - preparation of the variables that we need to have in order to update
+    // *************
+    const variablesListUpdate = {
+      data: {
+        id: currentItemInEditId,
+        // we need to edit the label's value:
+        label
+      }
+    }
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #3. - doing the async backend call with all details
+    // ************* (GraphQL query doing the heavy lifting now)
+    // *************
+    try {
+      await client
+        .mutate({ mutation: mutationDashboardItemUpdate, variables: variablesListUpdate })
+
+      dispatch(dashboardEditItem({ editItemIndex, label }))
+    } catch (errorReason) {
+      // Here you handle any errors.
+      // You can dispatch some
+      // custom error actions like:
+      // dispatch(yourCustomErrorAction(errorReason))
+
+      alert('Apollo client edit handler error. See console')
+      console.error('apollo client add handler error:', errorReason.message)
+    }
+  }
+}
+
 export const actions = {
   dashboardVisitIncrement
 }
