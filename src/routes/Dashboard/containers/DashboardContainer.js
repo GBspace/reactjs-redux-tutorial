@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 import {
-  dashboardAddItem,
+  dashboardAddItemAsync,
   dashboardEditItem,
   dashboardVisitIncrement,
   dashboardReorderItems,
@@ -20,7 +20,7 @@ import DashboardRoute from '../components/Dashboard'
 
 const mapDispatchToProps = {
   dashboardVisitIncrement : () => dashboardVisitIncrement(1),
-  dashboardAddItem,
+  dashboardAddItemAsync,
   dashboardEditItem,
   dashboardReorderItems,
   fetchDashboardDataAsync
