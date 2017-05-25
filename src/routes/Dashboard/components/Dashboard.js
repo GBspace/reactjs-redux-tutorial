@@ -8,7 +8,7 @@ class DashboardRoute extends React.Component {
     dashboardVisitIncrement: PropTypes.func.isRequired,
     dashboardAddItemAsync: PropTypes.func.isRequired,
     dashboardEditItem: PropTypes.func.isRequired,
-    dashboardReorderItems: PropTypes.func.isRequired,
+    dashboardReorderItemsAsync: PropTypes.func.isRequired,
     dashboard: PropTypes.object.isRequired,
     fetchDashboardDataAsync: PropTypes.func.isRequired
     // will comment session object while we don't use it
@@ -38,7 +38,7 @@ class DashboardRoute extends React.Component {
     // and the start and end value has to be different (otherwise reorder is not required)
     const reorderIsCorrect = !isNaN(start) && !isNaN(end) && start !== end
     if (reorderIsCorrect) {
-      this.props.dashboardReorderItems({ start, end })
+      this.props.dashboardReorderItemsAsync({ start, end })
     }
   }
 

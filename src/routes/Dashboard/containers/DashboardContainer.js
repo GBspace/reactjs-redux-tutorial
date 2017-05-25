@@ -3,7 +3,7 @@ import {
   dashboardAddItemAsync,
   dashboardEditItem,
   dashboardVisitIncrement,
-  dashboardReorderItems,
+  dashboardReorderItemsAsync,
   fetchDashboardDataAsync
 } from '../modules/dashboard'
 
@@ -22,7 +22,7 @@ const mapDispatchToProps = {
   dashboardVisitIncrement : () => dashboardVisitIncrement(1),
   dashboardAddItemAsync,
   dashboardEditItem,
-  dashboardReorderItems,
+  dashboardReorderItemsAsync,
   fetchDashboardDataAsync
 }
 

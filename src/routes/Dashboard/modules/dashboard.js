@@ -249,6 +249,87 @@ export const dashboardAddItemAsync = ({ label }) => {
   }
 }
 
+export const dashboardReorderItemsAsync = (reorderValues) => {
+  return async (dispatch, getState) => {
+    const { dashboardItems, currentListId } = getState().dashboard
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #1. - we have moved the reordering function
+    // ************* from our action handler to the action creator
+    // *************
+    const { end: nextPosIndex, start: currPosIndex } = reorderValues
+    const element = dashboardItems[currPosIndex]
+    let newDashboardItems = [
+      ...dashboardItems.slice(0, currPosIndex),
+      ...dashboardItems.slice(currPosIndex + 1)
+    ]
+
+    newDashboardItems.splice(nextPosIndex, 0, element)
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #2. - let's prepare the array of IDs (we will use it in our query)
+    // *************
+    // the currentListArray holds an array of IDs, which we will update later
+    // via the GraphQL query (see step 6, below)
+    const orderListIdsArray = newDashboardItems.map((dashboardItem) => dashboardItem.id)
+    console.info('newListArray', orderListIdsArray)
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #3. - preparation of the mutation query
+    // *************
+    const mutationListUpdate = gql`mutation UpdateDashboardItemListOrder($data: UpdateDashboardItemListOrderInput!) {
+      updateDashboardItemListOrder(input: $data) {
+        changedDashboardItemListOrder {
+          id
+          orderListIdsArray
+        }
+      }
+    }`
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #4. - preparation of the variables that
+    // ************* we need to have in order to update
+    // *************
+    const variablesListUpdate = {
+      data: {
+        // this ID, is the ID of the list which we want to update
+        id: currentListId,
+        // here is going a current list with all IDS (including the new one)
+        orderListIdsArray
+      }
+    }
+
+    // *****************************************************************
+    // *************
+    // ************* STEP #5. - doing the async backend call with all details
+    // ************* (GraphQL query doing the heavy lifting now)
+    // *************
+    try {
+      await client
+        .mutate({ mutation: mutationListUpdate, variables: variablesListUpdate })
+
+      // *****************************************************************
+      // *************
+      // ************* STEP #6. - let's dispatch the final effect,
+      // ************* so the view layer can re-render
+      // *************
+      dispatch(dashboardReorderItems(newDashboardItems))
+    } catch (errorReason) {
+      // Here you handle any errors.
+      // You can dispatch some
+      // custom error actions like:
+      // dispatch(yourCustomErrorAction(errorReason))
+
+      alert('Apollo client add handler error. See console')
+      console.error('apollo client add handler error:', errorReason.message)
+    }
+  }
+}
+
 export const actions = {
   dashboardVisitIncrement
 }
@@ -300,14 +381,7 @@ const ACTION_HANDLERS = {
     }
   },
   [DASHBOARD_REORDER_ITEM]: (state, action) => {
-    const { end: nextPosIndex, start: currPosIndex } = action.payload
-    const element = state.dashboardItems[currPosIndex]
-    let dashboardItems = [
-      ...state.dashboardItems.slice(0, currPosIndex),
-      ...state.dashboardItems.slice(currPosIndex + 1)
-    ]
-
-    dashboardItems.splice(nextPosIndex, 0, element)
+    const dashboardItems = action.payload
 
     return {
       ...state,
