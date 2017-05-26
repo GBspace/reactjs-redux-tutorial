@@ -2,11 +2,12 @@ import React from 'react'
 import { IndexLink, Link } from 'react-router'
 import './Header.scss'
 import LoginJSX from './LoginJSX'
+import LogoutJSX from './LogoutJSX'
 import PropTypes from 'prop-types'
 
-export const Header = ({ session, handleLogin }) => {
+export const Header = ({ session, handleLogin, handleLogout }) => {
   let loginMessageJSX = (!session.isLoggedIn && session.loginToken === 'invalid')
-    ? <p>Invalid login details, please try with correct user and password</p>
+    ? <p>{session.errorMessage}</p>
     : null
 
   return (
@@ -24,6 +25,7 @@ export const Header = ({ session, handleLogin }) => {
         Dashboard
       </Link>
       { !session.isLoggedIn && <LoginJSX handleLogin={handleLogin} /> }
+      { session.isLoggedIn && <LogoutJSX handleLogout={handleLogout} />}
       {loginMessageJSX}
     </div>
   )
@@ -31,7 +33,8 @@ export const Header = ({ session, handleLogin }) => {
 
 Header.propTypes = {
   session: PropTypes.object.isRequired,
-  handleLogin: PropTypes.func.isRequired
+  handleLogin: PropTypes.func.isRequired,
+  handleLogout: PropTypes.func.isRequired
 }
 
 export default Header

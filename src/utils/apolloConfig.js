@@ -10,4 +10,18 @@ const client = new ApolloClient({
   networkInterface
 })
 
+networkInterface.use([{
+  applyMiddleware (req, next) {
+    if (!req.options.headers) {
+      req.options.headers = {}  // Create the header object if needed.
+    }
+
+    if (localStorage.getItem('token')) {
+      req.options.headers.Authorization = `Bearer ${localStorage.getItem('token')}`
+    }
+
+    next()
+  }
+}])
+
 export default client
